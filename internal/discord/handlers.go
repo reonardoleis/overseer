@@ -13,7 +13,7 @@ var (
 	}
 )
 
-func setupHadlers(s *discordgo.Session) {
+func setupHandlers(s *discordgo.Session) {
 	for _, handler := range handlers {
 		s.AddHandler(handler)
 	}

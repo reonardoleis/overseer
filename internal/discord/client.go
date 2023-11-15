@@ -24,7 +24,7 @@ func Init(token string, clientId ...string) (*Client, error) {
 		return nil, err
 	}
 
-	setupHadlers(discordClient)
+	setupHandlers(discordClient)
 
 	discordClient.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsAllWithoutPrivileged | discordgo.IntentsGuildMembers)
 
