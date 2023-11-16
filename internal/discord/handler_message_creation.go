@@ -37,6 +37,8 @@ func handleMessageCreation(s *discordgo.Session, m *discordgo.MessageCreate) {
 			getFavorites(s, m)
 		case "randomaudios":
 			playRandomAudios(s, m, args[0])
+		case "chatgpt":
+			chatGPT(s, m, strings.Join(args, " "))
 		}
 	}
 }

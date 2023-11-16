@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/reonardoleis/overseer/internal/chatgpt"
 	"github.com/reonardoleis/overseer/internal/discord"
 )
 
@@ -13,6 +14,8 @@ func main() {
 	if err != nil {
 		log.Println("no .env file found")
 	}
+
+	chatgpt.Init(os.Getenv("OPENAI_KEY"))
 
 	cli, err := discord.Init(os.Getenv("DISCORD_TOKEN"))
 	if err != nil {

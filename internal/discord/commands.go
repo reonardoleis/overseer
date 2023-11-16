@@ -4,9 +4,9 @@ import (
 	"log"
 	"math/rand"
 	"strconv"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/reonardoleis/overseer/internal/chatgpt"
 	"github.com/reonardoleis/overseer/internal/sound"
 	"github.com/reonardoleis/overseer/internal/utils"
 )
@@ -137,17 +137,6 @@ func playRandomAudios(s *discordgo.Session, m *discordgo.MessageCreate, n string
 
 	for i := 0; i < numberOfAudios; i++ {
 		random := rand.Intn(count)
-		audio, err := utils.GetFileByPosition("audios", random)
-		if err != nil {
-			log.Println("discord: error getting audio filename:", err)
-			continue
-		}
-
-		duration, err := sound.GetDuration("audios/" + audio)
-		if err != nil {
-			log.Println("discord: error getting audio duration:", err)
-			continue
-		}
 
 		err = playAudio(s, m, strconv.Itoa(random))
 		if err != nil {
@@ -155,7 +144,22 @@ func playRandomAudios(s *discordgo.Session, m *discordgo.MessageCreate, n string
 			continue
 		}
 
-		time.Sleep(time.Duration(duration) * time.Second)
+	}
+
+	return nil
+}
+
+func chatGPT(s *discordgo.Session, m *discordgo.MessageCreate, message string) error {
+	text, err := chatgpt.Generate(message)
+	if err != nil {
+		log.Println("discord: error generating text:", err)
+		return err
+	}
+
+	_, err = s.ChannelMessageSend(m.ChannelID, text)
+	if err != nil {
+		log.Println("discord: error sending message:", err)
+		return err
 	}
 
 	return nil
