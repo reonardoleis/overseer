@@ -7,20 +7,16 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-type Client struct {
-	*discordgo.Session
-}
-
-func Init(token string, clientId ...string) (*Client, error) {
-	err := createCommands()
-	if err != nil {
-		log.Println("discord: error creating commands", err)
-		return nil, err
-	}
-
+func Init(token string, clientId ...string) (*discordgo.Session, error) {
 	discordClient, err := discordgo.New("Bot " + token)
 	if err != nil {
 		log.Println("discord: error creating discord client", err)
+		return nil, err
+	}
+
+	err = loadFavorites()
+	if err != nil {
+		log.Println("discord: error loading favorites", err)
 		return nil, err
 	}
 
@@ -28,13 +24,11 @@ func Init(token string, clientId ...string) (*Client, error) {
 
 	discordClient.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsAllWithoutPrivileged | discordgo.IntentsGuildMembers)
 
-	return &Client{
-		discordClient,
-	}, nil
+	return discordClient, nil
 }
 
-func (c *Client) Start() error {
-	err := c.Open()
+func Start(cli *discordgo.Session) error {
+	err := cli.Open()
 	if err != nil {
 		log.Println("discord: error opening connection", err)
 		return err

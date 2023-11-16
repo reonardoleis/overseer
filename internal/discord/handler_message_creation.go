@@ -1,11 +1,10 @@
 package discord
 
 import (
-	"log"
+	"fmt"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/reonardoleis/overseer/internal/sound"
 )
 
 func handleMessageCreation(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -13,32 +12,31 @@ func handleMessageCreation(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if strings.HasPrefix(m.Content, "!airhorn") {
-		c, err := s.State.Channel(m.ChannelID)
-		if err != nil {
+	if strings.HasPrefix(m.Content, "!") {
+		command, args := parseArguments(m.Content)
+
+		argumentInfo := commandsArgc[command]
+		if argumentInfo == nil {
+			s.ChannelMessageSend(m.ChannelID, "Invalid command")
 			return
 		}
 
-		g, err := s.State.Guild(c.GuildID)
-		if err != nil {
+		if expected, valid := argumentInfo.validateArguments(args); !valid {
+			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Invalid arguments, expected %d got %d", expected, len(args)))
 			return
 		}
 
-		for _, vs := range g.VoiceStates {
-			if vs.UserID == m.Author.ID {
-				buff, err := sound.LoadSound("ding.mp3")
-				if err != nil {
-					log.Println("discord: error loading sound:", err)
-					return
-				}
-
-				err = playSound(s, buff, g.ID, vs.ChannelID)
-				if err != nil {
-					log.Println("discord: error playing sound:", err)
-					return
-				}
-
-			}
+		switch command {
+		case "join":
+			joinVoiceChannel(s, m)
+		case "audio":
+			playAudio(s, m, args[0])
+		case "favoritecreate":
+			favoriteAudio(s, m, args[0], args[1])
+		case "favoritelist":
+			getFavorites(s, m)
+		case "randomaudios":
+			playRandomAudios(s, m, args[0])
 		}
 	}
 }

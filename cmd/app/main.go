@@ -20,7 +20,7 @@ func main() {
 		return
 	}
 
-	err = cli.Start()
+	err = discord.Start(cli)
 	if err != nil {
 		log.Println("error starting discord client", err)
 		return
