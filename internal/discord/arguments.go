@@ -10,7 +10,7 @@ var (
 	commandsArgc = map[string]*ArgumentInfo{
 		"join":           {0},
 		"audio":          {1},
-		"createfavorite": {1},
+		"favoritecreate": {2},
 		"favoritelist":   {0},
 		"randomaudios":   {1},
 	}

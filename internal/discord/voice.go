@@ -7,7 +7,7 @@ import (
 )
 
 func playSound(vc *discordgo.VoiceConnection, buffer [][]byte) (err error) {
-	time.Sleep(250 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 	vc.Speaking(true)
 
 	for _, buff := range buffer {
@@ -16,7 +16,7 @@ func playSound(vc *discordgo.VoiceConnection, buffer [][]byte) (err error) {
 
 	vc.Speaking(false)
 
-	time.Sleep(250 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 
 	return nil
 }

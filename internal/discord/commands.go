@@ -12,9 +12,9 @@ import (
 )
 
 func playAudio(s *discordgo.Session, m *discordgo.MessageCreate, idOrAlias string) error {
+	var path string
 	id, err := strconv.Atoi(idOrAlias)
 
-	var path string
 	if err != nil {
 		filename, exists := getFavorite(idOrAlias)
 		if !exists {
