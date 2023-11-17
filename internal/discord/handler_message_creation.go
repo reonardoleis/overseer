@@ -42,7 +42,7 @@ func handleMessageCreation(s *discordgo.Session, m *discordgo.MessageCreate) {
 		case "randomaudios":
 			randomaudios(s, m, args[0])
 		case "chatgpt":
-			chatgpt(s, m, strings.Join(args, " "))
+			chatgpt(s, m, strings.Join(args[1:], " "), args[0] == "usectx")
 		case "skip":
 			skip(s, m)
 		case "help":

@@ -152,9 +152,14 @@ func randomaudios(s *discordgo.Session, m *discordgo.MessageCreate, n string) er
 	return nil
 }
 
-func chatgpt(s *discordgo.Session, m *discordgo.MessageCreate, prompt string) error {
-	manager := getManager(m.GuildID)
-	gptContext := manager.getChatGptContext()
+func chatgpt(s *discordgo.Session, m *discordgo.MessageCreate, prompt string, useContext bool) error {
+	gptContext := []ai.MessageContext{}
+	var manager *Manager
+	if useContext {
+		log.Println("using context")
+		manager = getManager(m.GuildID)
+		gptContext = manager.getChatGptContext()
+	}
 
 	text, err := ai.Generate(prompt, gptContext)
 	if err != nil {
@@ -162,15 +167,17 @@ func chatgpt(s *discordgo.Session, m *discordgo.MessageCreate, prompt string) er
 		return err
 	}
 
-	manager.addChatGptContext(ai.MessageContext{
-		Role:    openai.ChatMessageRoleUser,
-		Content: prompt,
-	})
+	if useContext {
+		manager.addChatGptContext(ai.MessageContext{
+			Role:    openai.ChatMessageRoleUser,
+			Content: prompt,
+		})
 
-	manager.addChatGptContext(ai.MessageContext{
-		Role:    openai.ChatMessageRoleAssistant,
-		Content: text,
-	})
+		manager.addChatGptContext(ai.MessageContext{
+			Role:    openai.ChatMessageRoleAssistant,
+			Content: text,
+		})
+	}
 
 	_, err = s.ChannelMessageSend(m.ChannelID, text)
 	if err != nil {
