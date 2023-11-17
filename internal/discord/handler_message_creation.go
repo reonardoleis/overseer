@@ -51,6 +51,8 @@ func handleMessageCreation(s *discordgo.Session, m *discordgo.MessageCreate) {
 			leave(s, m)
 		case "loop":
 			loop(s, m)
+		case "chatgpttts":
+			chatgpttts(s, m, strings.Join(args, " "))
 		}
 	}
 }

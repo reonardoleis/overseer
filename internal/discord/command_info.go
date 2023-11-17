@@ -18,11 +18,12 @@ var (
 		"favoritecreate": {2, false, []string{"ID", "alias"}},
 		"favoritelist":   {0, false, []string{}},
 		"randomaudios":   {1, false, []string{"number of audios"}},
-		"chatgpt":        {200, true, []string{"prompt"}},
+		"chatgpt":        {800, true, []string{"prompt"}},
 		"skip":           {0, false, []string{}},
 		"help":           {0, false, []string{}},
 		"leave":          {0, false, []string{}},
 		"loop":           {0, false, []string{}},
+		"chatgpttts":     {200, true, []string{"prompt"}},
 	}
 )
 

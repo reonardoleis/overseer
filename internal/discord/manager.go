@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/reonardoleis/overseer/internal/ai"
 )
 
 type Manager struct {
@@ -13,6 +14,8 @@ type Manager struct {
 	audioQueue          *playableItemQueue
 	lastInteractionTime time.Time
 	vc                  *discordgo.VoiceConnection
+	chatGptContext      []ai.MessageContext
+	chatGptContextLock  sync.Mutex
 }
 
 var (
@@ -95,4 +98,22 @@ func managerCleanupJob() {
 
 		time.Sleep(time.Second * 10)
 	}
+}
+
+func (m *Manager) addChatGptContext(messageContext ai.MessageContext) {
+	m.chatGptContextLock.Lock()
+	defer m.chatGptContextLock.Unlock()
+
+	if len(m.chatGptContext) >= 10 {
+		m.chatGptContext = m.chatGptContext[1:]
+	}
+
+	m.chatGptContext = append(m.chatGptContext, messageContext)
+}
+
+func (m *Manager) getChatGptContext() []ai.MessageContext {
+	m.chatGptContextLock.Lock()
+	defer m.chatGptContextLock.Unlock()
+
+	return m.chatGptContext
 }

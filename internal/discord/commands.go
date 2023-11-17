@@ -11,6 +11,7 @@ import (
 	"github.com/reonardoleis/overseer/internal/database"
 	"github.com/reonardoleis/overseer/internal/sound"
 	"github.com/reonardoleis/overseer/internal/utils"
+	openai "github.com/sashabaranov/go-openai"
 )
 
 func audio(s *discordgo.Session, m *discordgo.MessageCreate, idOrAlias string) error {
@@ -152,11 +153,24 @@ func randomaudios(s *discordgo.Session, m *discordgo.MessageCreate, n string) er
 }
 
 func chatgpt(s *discordgo.Session, m *discordgo.MessageCreate, prompt string) error {
-	text, err := ai.Generate(prompt)
+	manager := getManager(m.GuildID)
+	gptContext := manager.getChatGptContext()
+
+	text, err := ai.Generate(prompt, gptContext)
 	if err != nil {
 		log.Println("discord: error generating text:", err)
 		return err
 	}
+
+	manager.addChatGptContext(ai.MessageContext{
+		Role:    openai.ChatMessageRoleUser,
+		Content: prompt,
+	})
+
+	manager.addChatGptContext(ai.MessageContext{
+		Role:    openai.ChatMessageRoleAssistant,
+		Content: text,
+	})
 
 	_, err = s.ChannelMessageSend(m.ChannelID, text)
 	if err != nil {
@@ -209,6 +223,16 @@ func loop(s *discordgo.Session, m *discordgo.MessageCreate) error {
 	manager.audioQueue.loop = !manager.audioQueue.loop
 
 	_, err := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Looping is now %t", manager.audioQueue.loop))
+	if err != nil {
+		log.Println("discord: error sending message:", err)
+		return err
+	}
+
+	return nil
+}
+
+func chatgpttts(s *discordgo.Session, m *discordgo.MessageCreate, prompt string) error {
+	_, err := s.ChannelMessageSend(m.ChannelID, "WIP")
 	if err != nil {
 		log.Println("discord: error sending message:", err)
 		return err
