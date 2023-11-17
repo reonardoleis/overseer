@@ -37,3 +37,14 @@ func DeleteFile(path string) error {
 
 	return nil
 }
+
+type BasePath string
+
+const (
+	AUDIOS_PATH BasePath = "audios"
+	TTS_PATH    BasePath = "tts"
+)
+
+func GetPath(base BasePath, path string) string {
+	return string(base) + "/" + path
+}

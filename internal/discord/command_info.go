@@ -1,23 +1,48 @@
 package discord
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type CommandInfo struct {
 	argc      int
 	isMaximum bool
+	argNames  []string
 }
 
 var (
 	commands = map[string]*CommandInfo{
-		"join":           {0, false},
-		"audio":          {1, false},
-		"favoritecreate": {2, false},
-		"favoritelist":   {0, false},
-		"randomaudios":   {1, false},
-		"chatgpt":        {200, true},
-		"skip":           {0, false},
+		"join":           {0, false, []string{}},
+		"audio":          {1, false, []string{"ID or alias"}},
+		"favoritecreate": {2, false, []string{"ID", "alias"}},
+		"favoritelist":   {0, false, []string{}},
+		"randomaudios":   {1, false, []string{"number of audios"}},
+		"chatgpt":        {200, true, []string{"prompt"}},
+		"skip":           {0, false, []string{}},
+		"help":           {0, false, []string{}},
+		"leave":          {0, false, []string{}},
 	}
 )
+
+func commandHelp() string {
+	s := "```"
+	for cmd, info := range commands {
+		s += cmd
+		for _, arg := range info.argNames {
+			s += " <" + arg + ">"
+		}
+
+		if info.isMaximum {
+			s += fmt.Sprintf(" (maximum %d)", info.argc)
+		}
+
+		s += "\n"
+	}
+	s += "```"
+
+	return s
+}
 
 func getCommandInfo(command string) *CommandInfo {
 	return commands[command]

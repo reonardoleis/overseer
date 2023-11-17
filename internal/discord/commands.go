@@ -16,23 +16,23 @@ func audio(s *discordgo.Session, m *discordgo.MessageCreate, idOrAlias string) e
 	var path string
 	id, err := strconv.Atoi(idOrAlias)
 
+	var filename string
 	if err != nil {
-		filename, exists := database.GetFavorite(idOrAlias)
+		var exists bool
+		filename, exists = database.GetFavorite(idOrAlias)
 		if !exists {
 			s.ChannelMessageSend(m.ChannelID, "Invalid alias")
 			return err
 		}
-
-		path = "audios/" + filename
 	} else {
-		filename, err := utils.GetFileByPosition("audios", id)
+		filename, err = utils.GetFileByPosition("audios", id)
 		if err != nil {
 			log.Println("discord: error getting audio filename:", err)
 			return err
 		}
-
-		path = "audios/" + filename
 	}
+
+	path = utils.GetPath(utils.AUDIOS_PATH, filename)
 
 	buf, err := sound.LoadSound(path)
 	if err != nil {
@@ -175,6 +175,30 @@ func skip(s *discordgo.Session, m *discordgo.MessageCreate) error {
 		log.Println("discord: error sending message:", err)
 		return err
 	}
+
+	return nil
+}
+
+func help(s *discordgo.Session, m *discordgo.MessageCreate) error {
+	_, err := s.ChannelMessageSend(m.ChannelID, commandHelp())
+	if err != nil {
+		log.Println("discord: error sending message:", err)
+		return err
+	}
+
+	return nil
+}
+
+func leave(s *discordgo.Session, m *discordgo.MessageCreate) error {
+	manager := getManager(m.GuildID)
+
+	err := manager.vc.Disconnect()
+	if err != nil {
+		log.Println("discord: error disconnecting from voice channel:", err)
+		return err
+	}
+
+	removeManager(m.GuildID)
 
 	return nil
 }

@@ -45,6 +45,10 @@ func handleMessageCreation(s *discordgo.Session, m *discordgo.MessageCreate) {
 			chatgpt(s, m, strings.Join(args, " "))
 		case "skip":
 			skip(s, m)
+		case "help":
+			help(s, m)
+		case "leave":
+			leave(s, m)
 		}
 	}
 }

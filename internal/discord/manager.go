@@ -65,6 +65,13 @@ func getManager(guildID string) *Manager {
 	return managers[guildID]
 }
 
+func removeManager(guildID string) {
+	managersLock.Lock()
+	defer managersLock.Unlock()
+
+	delete(managers, guildID)
+}
+
 func (m *Manager) setVC(vc *discordgo.VoiceConnection) {
 	m.vc = vc
 	go handleVoice(m.vc.OpusRecv, m)

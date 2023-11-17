@@ -4,17 +4,15 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-	"sync"
 )
 
 var (
-	favorites     = make(map[string]string)
-	favoritesLock = sync.Mutex{}
+	favorites = make(map[string]string)
 )
 
 func GetFavorite(alias string) (string, bool) {
-	favoritesLock.Lock()
-	defer favoritesLock.Unlock()
+	locks[FAVORITES].Lock()
+	defer locks[FAVORITES].Unlock()
 
 	v, ok := favorites[alias]
 	return v, ok
@@ -59,8 +57,8 @@ func LoadFavorites() error {
 }
 
 func CreateFavorite(filename string, alias string) error {
-	favoritesLock.Lock()
-	defer favoritesLock.Unlock()
+	locks[FAVORITES].Lock()
+	defer locks[FAVORITES].Unlock()
 
 	favorites[alias] = filename
 
@@ -80,8 +78,8 @@ func CreateFavorite(filename string, alias string) error {
 }
 
 func GetFormattedFavorites() string {
-	favoritesLock.Lock()
-	defer favoritesLock.Unlock()
+	locks[FAVORITES].Lock()
+	defer locks[FAVORITES].Unlock()
 
 	s := "\n**Favorites**\n\n"
 	for k, _ := range favorites {
