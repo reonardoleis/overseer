@@ -15,30 +15,34 @@ func handleMessageCreation(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if strings.HasPrefix(m.Content, "!") {
 		command, args := parseArguments(m.Content)
 
-		argumentInfo := commandsArgc[command]
-		if argumentInfo == nil {
+		commandInfo := getCommandInfo(command)
+		if commandInfo == nil {
 			s.ChannelMessageSend(m.ChannelID, "Invalid command")
 			return
 		}
 
-		if expected, valid := argumentInfo.validateArguments(args); !valid {
+		if expected, valid := commandInfo.validateArguments(args); !valid {
 			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Invalid arguments, expected %d got %d", expected, len(args)))
 			return
 		}
 
+		if !managerExists(m.GuildID, true) {
+			createManager(m.GuildID, true)
+		}
+
 		switch command {
 		case "join":
-			joinVoiceChannel(s, m)
+			join(s, m)
 		case "audio":
-			playAudio(s, m, args[0])
+			audio(s, m, args[0])
 		case "favoritecreate":
-			favoriteAudio(s, m, args[0], args[1])
+			favoritecreate(s, m, args[0], args[1])
 		case "favoritelist":
-			getFavorites(s, m)
+			favoritelist(s, m)
 		case "randomaudios":
-			playRandomAudios(s, m, args[0])
+			randomaudios(s, m, args[0])
 		case "chatgpt":
-			chatGPT(s, m, strings.Join(args, " "))
+			chatgpt(s, m, strings.Join(args, " "))
 		}
 	}
 }

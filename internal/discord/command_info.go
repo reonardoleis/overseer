@@ -2,13 +2,13 @@ package discord
 
 import "strings"
 
-type ArgumentInfo struct {
+type CommandInfo struct {
 	argc      int
 	isMaximum bool
 }
 
 var (
-	commandsArgc = map[string]*ArgumentInfo{
+	commands = map[string]*CommandInfo{
 		"join":           {0, false},
 		"audio":          {1, false},
 		"favoritecreate": {2, false},
@@ -18,6 +18,10 @@ var (
 	}
 )
 
+func getCommandInfo(command string) *CommandInfo {
+	return commands[command]
+}
+
 func parseArguments(message string) (command string, args []string) {
 	s := strings.Split(message, " ")
 
@@ -25,6 +29,6 @@ func parseArguments(message string) (command string, args []string) {
 	return s[0], s[1:]
 }
 
-func (arg *ArgumentInfo) validateArguments(args []string) (expected int, ok bool) {
+func (arg *CommandInfo) validateArguments(args []string) (expected int, ok bool) {
 	return arg.argc, (len(args) == arg.argc || (arg.isMaximum && len(args) <= arg.argc))
 }
