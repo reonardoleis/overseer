@@ -100,15 +100,19 @@ func managerCleanupJob() {
 	}
 }
 
-func (m *Manager) addChatGptContext(messageContext ai.MessageContext) {
+func (m *Manager) addChatGptContext(messageContext ...ai.MessageContext) {
+	if len(messageContext) == 0 {
+		return
+	}
+
 	m.chatGptContextLock.Lock()
 	defer m.chatGptContextLock.Unlock()
 
 	if len(m.chatGptContext) >= 10 {
-		m.chatGptContext = m.chatGptContext[1:]
+		m.chatGptContext = m.chatGptContext[len(messageContext):]
 	}
 
-	m.chatGptContext = append(m.chatGptContext, messageContext)
+	m.chatGptContext = append(m.chatGptContext, messageContext...)
 }
 
 func (m *Manager) getChatGptContext() []ai.MessageContext {

@@ -168,15 +168,16 @@ func chatgpt(s *discordgo.Session, m *discordgo.MessageCreate, prompt string, us
 	}
 
 	if useContext {
-		manager.addChatGptContext(ai.MessageContext{
-			Role:    openai.ChatMessageRoleUser,
-			Content: prompt,
-		})
-
-		manager.addChatGptContext(ai.MessageContext{
-			Role:    openai.ChatMessageRoleAssistant,
-			Content: text,
-		})
+		manager.addChatGptContext(
+			ai.MessageContext{
+				Role:    openai.ChatMessageRoleUser,
+				Content: prompt,
+			},
+			ai.MessageContext{
+				Role:    openai.ChatMessageRoleAssistant,
+				Content: text,
+			},
+		)
 	}
 
 	_, err = s.ChannelMessageSend(m.ChannelID, text)
