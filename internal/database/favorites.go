@@ -13,6 +13,9 @@ var (
 )
 
 func GetFavorite(alias string) (string, bool) {
+	favoritesLock.Lock()
+	defer favoritesLock.Unlock()
+
 	v, ok := favorites[alias]
 	return v, ok
 }
@@ -77,6 +80,9 @@ func CreateFavorite(filename string, alias string) error {
 }
 
 func GetFormattedFavorites() string {
+	favoritesLock.Lock()
+	defer favoritesLock.Unlock()
+
 	s := "\n**Favorites**\n\n"
 	for k, _ := range favorites {
 		s += k + "\n"

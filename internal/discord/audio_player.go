@@ -60,7 +60,6 @@ func playAudio(vc *discordgo.VoiceConnection, pi *playableItem) (err error) {
 	}
 
 	vc.Speaking(false)
-
 	time.Sleep(50 * time.Millisecond)
 
 	return nil
