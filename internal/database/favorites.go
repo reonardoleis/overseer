@@ -1,4 +1,4 @@
-package discord
+package database
 
 import (
 	"encoding/json"
@@ -12,12 +12,12 @@ var (
 	favoritesLock = sync.Mutex{}
 )
 
-func getFavorite(alias string) (string, bool) {
+func GetFavorite(alias string) (string, bool) {
 	v, ok := favorites[alias]
 	return v, ok
 }
 
-func loadFavorites() error {
+func LoadFavorites() error {
 	_, err := os.Stat("favorites.json")
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -55,7 +55,7 @@ func loadFavorites() error {
 	return nil
 }
 
-func createFavorite(filename string, alias string) error {
+func CreateFavorite(filename string, alias string) error {
 	favoritesLock.Lock()
 	defer favoritesLock.Unlock()
 
@@ -76,7 +76,7 @@ func createFavorite(filename string, alias string) error {
 	return nil
 }
 
-func getFormattedFavorites() string {
+func GetFormattedFavorites() string {
 	s := "\n**Favorites**\n\n"
 	for k, _ := range favorites {
 		s += k + "\n"

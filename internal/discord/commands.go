@@ -7,6 +7,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/reonardoleis/overseer/internal/ai"
+	"github.com/reonardoleis/overseer/internal/database"
 	"github.com/reonardoleis/overseer/internal/sound"
 	"github.com/reonardoleis/overseer/internal/utils"
 )
@@ -16,7 +17,7 @@ func audio(s *discordgo.Session, m *discordgo.MessageCreate, idOrAlias string) e
 	id, err := strconv.Atoi(idOrAlias)
 
 	if err != nil {
-		filename, exists := getFavorite(idOrAlias)
+		filename, exists := database.GetFavorite(idOrAlias)
 		if !exists {
 			s.ChannelMessageSend(m.ChannelID, "Invalid alias")
 			return err
@@ -56,7 +57,7 @@ func favoritecreate(s *discordgo.Session, m *discordgo.MessageCreate, audioId, a
 		return err
 	}
 
-	if _, exists := getFavorite(alias); exists {
+	if _, exists := database.GetFavorite(alias); exists {
 		s.ChannelMessageSend(m.ChannelID, "Alias already exists")
 		return nil
 	}
@@ -67,7 +68,7 @@ func favoritecreate(s *discordgo.Session, m *discordgo.MessageCreate, audioId, a
 		return err
 	}
 
-	err = createFavorite(filename, alias)
+	err = database.CreateFavorite(filename, alias)
 	if err != nil {
 		log.Println("discord: error creating favorite:", err)
 		return err
@@ -97,18 +98,21 @@ func join(s *discordgo.Session, m *discordgo.MessageCreate) (*discordgo.VoiceCon
 		}
 	}
 
-	vc, err := s.ChannelVoiceJoin(g.ID, channelId, false, true)
+	vc, err := s.ChannelVoiceJoin(g.ID, channelId, false, false)
 	if err != nil {
 		return nil, err
 	}
 
-	go getManager(m.GuildID).audioQueue.audioPlayerWorker(vc)
+	manager := getManager(m.GuildID)
+	manager.setVC(vc)
+
+	go manager.audioPlayerWorker()
 
 	return vc, nil
 }
 
 func favoritelist(s *discordgo.Session, m *discordgo.MessageCreate) error {
-	formattedFavorites := getFormattedFavorites()
+	formattedFavorites := database.GetFormattedFavorites()
 
 	_, err := s.ChannelMessageSend(m.ChannelID, formattedFavorites)
 	if err != nil {

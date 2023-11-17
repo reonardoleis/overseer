@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/reonardoleis/overseer/internal/database"
 )
 
 func Init(token string, clientId ...string) (*discordgo.Session, error) {
@@ -14,13 +15,15 @@ func Init(token string, clientId ...string) (*discordgo.Session, error) {
 		return nil, err
 	}
 
-	err = loadFavorites()
+	err = database.LoadFavorites()
 	if err != nil {
 		log.Println("discord: error loading favorites", err)
 		return nil, err
 	}
 
 	setupHandlers(discordClient)
+
+	go managerCleanupJob()
 
 	discordClient.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsAllWithoutPrivileged | discordgo.IntentsGuildMembers)
 
