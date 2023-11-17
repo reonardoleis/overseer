@@ -44,7 +44,7 @@ func createManager(guildID string, useLock bool) *Manager {
 		guildID: guildID,
 		audioQueue: &playableItemQueue{
 			guildID: guildID,
-			queue:   make(chan playableItem, 1024),
+			queue:   make(chan *playableItem, 1024),
 		},
 		lastInteractionTime: time.Now(),
 	}

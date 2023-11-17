@@ -15,6 +15,7 @@ var (
 		"favoritelist":   {0, false},
 		"randomaudios":   {1, false},
 		"chatgpt":        {200, true},
+		"skip":           {0, false},
 	}
 )
 

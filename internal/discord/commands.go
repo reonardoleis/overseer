@@ -41,7 +41,7 @@ func audio(s *discordgo.Session, m *discordgo.MessageCreate, idOrAlias string) e
 	}
 
 	manager := getManager(m.GuildID)
-	manager.audioQueue.add(playableItem{
+	manager.audioQueue.add(&playableItem{
 		buffer: buf,
 		id:     id,
 		alias:  idOrAlias,
@@ -158,6 +158,19 @@ func chatgpt(s *discordgo.Session, m *discordgo.MessageCreate, prompt string) er
 	}
 
 	_, err = s.ChannelMessageSend(m.ChannelID, text)
+	if err != nil {
+		log.Println("discord: error sending message:", err)
+		return err
+	}
+
+	return nil
+}
+
+func skip(s *discordgo.Session, m *discordgo.MessageCreate) error {
+	manager := getManager(m.GuildID)
+	manager.audioQueue.skip()
+
+	_, err := s.ChannelMessageSend(m.ChannelID, "Skipping")
 	if err != nil {
 		log.Println("discord: error sending message:", err)
 		return err

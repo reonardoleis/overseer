@@ -10,13 +10,15 @@ import (
 
 type playableItemQueue struct {
 	guildID string
-	queue   chan playableItem
+	current *playableItem
+	queue   chan *playableItem
 }
 
 type playableItem struct {
 	id     int
 	alias  string
 	buffer [][]byte
+	skip   bool
 }
 
 func (p playableItem) String() string {
@@ -27,8 +29,12 @@ func (p playableItem) String() string {
 	return strconv.Itoa(p.id)
 }
 
-func (p *playableItemQueue) add(item playableItem) {
+func (p *playableItemQueue) add(item *playableItem) {
 	p.queue <- item
+}
+
+func (p *playableItemQueue) skip() {
+	p.current.skip = true
 }
 
 func (p *playableItemQueue) audioPlayerWorker(vc *discordgo.VoiceConnection) {
@@ -36,15 +42,20 @@ func (p *playableItemQueue) audioPlayerWorker(vc *discordgo.VoiceConnection) {
 	for {
 		item := <-p.queue
 		log.Println("playing audio", item.String(), "for guild", p.guildID)
-		playAudio(vc, item.buffer)
+		p.current = item
+		playAudio(vc, item)
 	}
 }
 
-func playAudio(vc *discordgo.VoiceConnection, buffer [][]byte) (err error) {
+func playAudio(vc *discordgo.VoiceConnection, pi *playableItem) (err error) {
 	time.Sleep(50 * time.Millisecond)
 	vc.Speaking(true)
 
-	for _, buff := range buffer {
+	for _, buff := range pi.buffer {
+		if pi.skip {
+			break
+		}
+
 		vc.OpusSend <- buff
 	}
 
