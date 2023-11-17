@@ -49,6 +49,8 @@ func handleMessageCreation(s *discordgo.Session, m *discordgo.MessageCreate) {
 			help(s, m)
 		case "leave":
 			leave(s, m)
+		case "loop":
+			loop(s, m)
 		}
 	}
 }

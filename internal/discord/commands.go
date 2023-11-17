@@ -1,6 +1,7 @@
 package discord
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"strconv"
@@ -199,6 +200,19 @@ func leave(s *discordgo.Session, m *discordgo.MessageCreate) error {
 	}
 
 	removeManager(m.GuildID)
+
+	return nil
+}
+
+func loop(s *discordgo.Session, m *discordgo.MessageCreate) error {
+	manager := getManager(m.GuildID)
+	manager.audioQueue.loop = !manager.audioQueue.loop
+
+	_, err := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Looping is now %t", manager.audioQueue.loop))
+	if err != nil {
+		log.Println("discord: error sending message:", err)
+		return err
+	}
 
 	return nil
 }

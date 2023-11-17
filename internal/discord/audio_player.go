@@ -10,6 +10,7 @@ import (
 
 type playableItemQueue struct {
 	guildID string
+	loop    bool
 	current *playableItem
 	queue   chan *playableItem
 }
@@ -43,20 +44,26 @@ func (p *playableItemQueue) audioPlayerWorker(vc *discordgo.VoiceConnection) {
 		item := <-p.queue
 		log.Println("playing audio", item.String(), "for guild", p.guildID)
 		p.current = item
-		playAudio(vc, item)
+		p.playAudio(vc, item)
 	}
 }
 
-func playAudio(vc *discordgo.VoiceConnection, pi *playableItem) (err error) {
+func (p *playableItemQueue) playAudio(vc *discordgo.VoiceConnection, pi *playableItem) (err error) {
 	time.Sleep(50 * time.Millisecond)
 	vc.Speaking(true)
 
-	for _, buff := range pi.buffer {
-		if pi.skip {
-			break
+	for {
+		for _, buff := range pi.buffer {
+			if pi.skip {
+				break
+			}
+
+			vc.OpusSend <- buff
 		}
 
-		vc.OpusSend <- buff
+		if !p.loop {
+			break
+		}
 	}
 
 	vc.Speaking(false)

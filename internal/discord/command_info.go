@@ -22,6 +22,7 @@ var (
 		"skip":           {0, false, []string{}},
 		"help":           {0, false, []string{}},
 		"leave":          {0, false, []string{}},
+		"loop":           {0, false, []string{}},
 	}
 )
 
