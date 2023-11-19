@@ -24,9 +24,13 @@ func createPionRTPPacket(p *discordgo.Packet) *rtp.Packet {
 	}
 }
 
-func handleVoice(c chan *discordgo.Packet, manager *Manager) {
+func handleVoice(c chan *discordgo.Packet, manager *Manager, isClosed *bool) {
 	files := make(map[uint32]media.Writer)
 	for p := range c {
+		if *isClosed {
+			break
+		}
+
 		manager.lastInteractionTime = time.Now()
 		file, ok := files[p.SSRC]
 		if !ok {
@@ -44,9 +48,12 @@ func handleVoice(c chan *discordgo.Packet, manager *Manager) {
 		if err != nil {
 			log.Println("discord: failed to write voice to discord rtp", err)
 		}
+
 	}
 
 	for _, f := range files {
 		f.Close()
 	}
+
+	fmt.Println("Finished listening")
 }

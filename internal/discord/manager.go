@@ -77,7 +77,6 @@ func removeManager(guildID string) {
 
 func (m *Manager) setVC(vc *discordgo.VoiceConnection) {
 	m.vc = vc
-	go handleVoice(m.vc.OpusRecv, m)
 }
 
 func (m *Manager) audioPlayerWorker() {

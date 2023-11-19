@@ -249,7 +249,7 @@ func chatgpttts(s *discordgo.Session, m *discordgo.MessageCreate, prompt string)
 		return err
 	}
 
-	text, err := ai.Generate(prompt, []ai.MessageContext{}, 200)
+	text, err := ai.Generate(prompt, []ai.MessageContext{}, 350)
 	if err != nil {
 		log.Println("discord: error generating text:", err)
 		return err
@@ -285,7 +285,7 @@ func chatgpttts(s *discordgo.Session, m *discordgo.MessageCreate, prompt string)
 		return err
 	}
 
-	_, err = s.ChannelMessageEdit(m.ChannelID, messageResp.ID, "Generating audio... Done!")
+	_, err = s.ChannelMessageEdit(m.ChannelID, messageResp.ID, "Generating audio... Done!\nContent:\n\n"+text)
 	if err != nil {
 		log.Println("discord: error editing message:", err)
 		return err

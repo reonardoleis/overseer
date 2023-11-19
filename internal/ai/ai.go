@@ -75,3 +75,16 @@ func TTS(text string) (io.ReadCloser, error) {
 
 	return resp, nil
 }
+
+func Transcribe(audio io.Reader) (string, error) {
+	resp, err := cli.CreateTranscription(context.TODO(), openai.AudioRequest{
+		Reader: audio,
+	})
+
+	if err != nil {
+		log.Println("chatgpt: error generating text:", err)
+		return "", err
+	}
+
+	return resp.Text, nil
+}
