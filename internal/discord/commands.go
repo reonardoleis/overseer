@@ -2,11 +2,14 @@ package discord
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"math/rand"
+	"os"
 	"strconv"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/google/uuid"
 	"github.com/reonardoleis/overseer/internal/ai"
 	"github.com/reonardoleis/overseer/internal/database"
 	"github.com/reonardoleis/overseer/internal/sound"
@@ -240,11 +243,58 @@ func loop(s *discordgo.Session, m *discordgo.MessageCreate) error {
 }
 
 func chatgpttts(s *discordgo.Session, m *discordgo.MessageCreate, prompt string) error {
-	_, err := s.ChannelMessageSend(m.ChannelID, "WIP")
+	messageResp, err := s.ChannelMessageSend(m.ChannelID, "Generating audio...")
 	if err != nil {
 		log.Println("discord: error sending message:", err)
 		return err
 	}
+
+	text, err := ai.Generate(prompt, []ai.MessageContext{}, 200)
+	if err != nil {
+		log.Println("discord: error generating text:", err)
+		return err
+	}
+
+	audio, err := ai.TTS(text)
+	if err != nil {
+		log.Println("discord: error generating audio:", err)
+		return err
+	}
+
+	file, err := os.Create(utils.GetPath(utils.AUDIOS_PATH, "aitts_"+uuid.New().String()+".mp3"))
+	if err != nil {
+		log.Println("discord: error creating file:", err)
+		return err
+	}
+
+	_, err = io.Copy(file, audio)
+	if err != nil {
+		log.Println("discord: error copying audio to file:", err)
+		return err
+	}
+
+	err = file.Close()
+	if err != nil {
+		log.Println("discord: error closing file:", err)
+		return err
+	}
+
+	buff, err := sound.LoadSound(file.Name())
+	if err != nil {
+		log.Println("discord: error loading sound:", err)
+		return err
+	}
+
+	_, err = s.ChannelMessageEdit(m.ChannelID, messageResp.ID, "Generating audio... Done!")
+	if err != nil {
+		log.Println("discord: error editing message:", err)
+		return err
+	}
+
+	manager := getManager(m.GuildID)
+	manager.audioQueue.add(&playableItem{
+		buffer: buff,
+	})
 
 	return nil
 }
