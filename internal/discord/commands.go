@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/uuid"
@@ -249,7 +250,7 @@ func chatgpttts(s *discordgo.Session, m *discordgo.MessageCreate, prompt string)
 		return err
 	}
 
-	text, err := ai.Generate(prompt, []ai.MessageContext{}, 350)
+	text, err := ai.Generate(prompt, []ai.MessageContext{}, 500)
 	if err != nil {
 		log.Println("discord: error generating text:", err)
 		return err
@@ -273,21 +274,36 @@ func chatgpttts(s *discordgo.Session, m *discordgo.MessageCreate, prompt string)
 		return err
 	}
 
-	err = file.Close()
-	if err != nil {
-		log.Println("discord: error closing file:", err)
-		return err
-	}
-
 	buff, err := sound.LoadSound(file.Name())
 	if err != nil {
 		log.Println("discord: error loading sound:", err)
 		return err
 	}
 
-	_, err = s.ChannelMessageEdit(m.ChannelID, messageResp.ID, "Generating audio... Done!\nContent:\n\n"+text)
+	file.Seek(0, 0)
+	editContent := "Generating audio... Done!\nContent:\n\n" + text
+	editedMessage := &discordgo.MessageEdit{
+		Content: &editContent,
+		ID:      messageResp.ID,
+		Channel: m.ChannelID,
+		Files: []*discordgo.File{
+			{
+				Name:        file.Name(),
+				ContentType: "audio/mpeg",
+				Reader:      file,
+			},
+		},
+	}
+
+	_, err = s.ChannelMessageEditComplex(editedMessage)
 	if err != nil {
 		log.Println("discord: error editing message:", err)
+		return err
+	}
+
+	err = file.Close()
+	if err != nil {
+		log.Println("discord: error closing file:", err)
 		return err
 	}
 
@@ -295,6 +311,52 @@ func chatgpttts(s *discordgo.Session, m *discordgo.MessageCreate, prompt string)
 	manager.audioQueue.add(&playableItem{
 		buffer: buff,
 	})
+
+	return nil
+}
+
+func image(s *discordgo.Session, m *discordgo.MessageCreate, prompt string) error {
+	messageResp, err := s.ChannelMessageSend(m.ChannelID, "Generating image...")
+	if err != nil {
+		log.Println("discord: error sending message:", err)
+		return err
+	}
+
+	optimizedPrompt, err := ai.Generate(
+		"Optmize this prompt for image generation, answer with the optimized prompt only: "+prompt,
+		[]ai.MessageContext{},
+		500,
+	)
+	if err != nil {
+		log.Println("discord: error generating optimized prompt:", err)
+		return err
+	}
+
+	image, err := ai.Image(optimizedPrompt)
+	if err != nil {
+		log.Println("discord: error generating image:", err)
+		return err
+	}
+
+	editContent := "Generating image... Done!"
+	editedMessage := &discordgo.MessageEdit{
+		Content: &editContent,
+		ID:      messageResp.ID,
+		Channel: m.ChannelID,
+		Files: []*discordgo.File{
+			{
+				Name:        strings.ReplaceAll(prompt, " ", "_") + ".png",
+				ContentType: "image/png",
+				Reader:      image,
+			},
+		},
+	}
+
+	_, err = s.ChannelMessageEditComplex(editedMessage)
+	if err != nil {
+		log.Println("discord: error editing message:", err)
+		return err
+	}
 
 	return nil
 }

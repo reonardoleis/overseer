@@ -1,7 +1,9 @@
 package ai
 
 import (
+	"bytes"
 	"context"
+	"encoding/base64"
 	"errors"
 	"io"
 	"log"
@@ -87,4 +89,32 @@ func Transcribe(audio io.Reader) (string, error) {
 	}
 
 	return resp.Text, nil
+}
+
+func Image(prompt string) (io.ReadCloser, error) {
+	resp, err := cli.CreateImage(context.TODO(), openai.ImageRequest{
+		Prompt:         prompt,
+		Model:          openai.CreateImageModelDallE3,
+		N:              1,
+		Quality:        openai.CreateImageQualityStandard,
+		Size:           openai.CreateImageSize1024x1024,
+		ResponseFormat: openai.CreateImageResponseFormatB64JSON,
+		Style:          openai.CreateImageStyleNatural,
+		User:           "overseer",
+	})
+
+	if err != nil {
+		log.Println("chatgpt: error generating text:", err)
+		return nil, err
+	}
+
+	imageBase64 := resp.Data[0].B64JSON
+
+	imageBytes, err := base64.StdEncoding.DecodeString(imageBase64)
+	if err != nil {
+		log.Println("chatgpt: error decoding base64:", err)
+		return nil, err
+	}
+
+	return io.NopCloser(bytes.NewReader(imageBytes)), nil
 }

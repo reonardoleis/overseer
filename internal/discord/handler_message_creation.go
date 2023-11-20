@@ -53,6 +53,8 @@ func handleMessageCreation(s *discordgo.Session, m *discordgo.MessageCreate) {
 			loop(s, m)
 		case "chatgpttts":
 			chatgpttts(s, m, strings.Join(args, " "))
+		case "image":
+			image(s, m, strings.Join(args, " "))
 		}
 	}
 }

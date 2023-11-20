@@ -24,6 +24,7 @@ var (
 		"leave":          {0, false, []string{}},
 		"loop":           {0, false, []string{}},
 		"chatgpttts":     {200, true, []string{"prompt"}},
+		"image":          {50, true, []string{"prompt"}},
 	}
 )
 
