@@ -14,4 +14,4 @@ A "sarcastic" Discord bot, packed with numerous features. While most of them are
 - Music support (YouTube, Spotify)
 - Speech-to-text for adding voice recognition to certain features
 - Moderation with "meme punishments" utilizing voice recognition
-- AI video generation with virtual webcam streaming"
+- AI video generation with virtual webcam streaming
