@@ -2,15 +2,16 @@
 
 # Overseer
 
-"Sarcastic" bot for Discord, packed with many features - most of them, while amusing, may not have much practical utility
+A "sarcastic" Discord bot, packed with numerous features. While most of them are amusing, they may not necessarily offer much practical utility.
 
-## Current features:
-- Audio playing from audios folder (support favorite creation & listing)
-- TTS using OpenAI's APIs
-- ChatGPT integration
+### Current features:
+- Audio playback from the 'audios' folder (supports favorite creation & listing)
+- Text-to-Speech (TTS) using OpenAI's APIs
+- Integration with ChatGPT
 - AI image generation
 
-## Future features:
-- Music support (YT, Spotify)
-- Speech to text to add voice recognition on some featuers
-- AI video generation with virtual webcam streaming
+### Future features:
+- Music support (YouTube, Spotify)
+- Speech-to-text for adding voice recognition to certain features
+- Moderation with "meme punishments" utilizing voice recognition
+- AI video generation with virtual webcam streaming"
