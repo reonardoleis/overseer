@@ -1,7 +1,6 @@
 package sound
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"math"
@@ -12,7 +11,6 @@ import (
 )
 
 func LoadSound(path string) ([][]byte, error) {
-	fmt.Println(path)
 	options := dca.StdEncodeOptions
 	options.RawOutput = true
 	options.Bitrate = 96

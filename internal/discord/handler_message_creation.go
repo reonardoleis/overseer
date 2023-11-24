@@ -55,6 +55,10 @@ func handleMessageCreation(s *discordgo.Session, m *discordgo.MessageCreate) {
 			chatgpttts(s, m, strings.Join(args, " "))
 		case "image":
 			image(s, m, strings.Join(args, " "))
+		case "fncreate":
+			fncreate(s, m, args[0], strings.Join(args[1:], " "))
+		case "fnrun":
+			fnrun(s, m, args[0], args[1:])
 		}
 	}
 }

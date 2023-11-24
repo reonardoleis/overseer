@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/reonardoleis/overseer/internal/ai"
 	"github.com/reonardoleis/overseer/internal/database"
+	"github.com/reonardoleis/overseer/internal/functions"
 	"github.com/reonardoleis/overseer/internal/sound"
 	"github.com/reonardoleis/overseer/internal/utils"
 	openai "github.com/sashabaranov/go-openai"
@@ -355,6 +356,54 @@ func image(s *discordgo.Session, m *discordgo.MessageCreate, prompt string) erro
 	_, err = s.ChannelMessageEditComplex(editedMessage)
 	if err != nil {
 		log.Println("discord: error editing message:", err)
+		return err
+	}
+
+	return nil
+}
+
+func fncreate(s *discordgo.Session, m *discordgo.MessageCreate, name, code string) error {
+	if valid := functions.Validate(code); !valid {
+		_, err := s.ChannelMessageSend(m.ChannelID, "Invalid function")
+		if err != nil {
+			log.Println("discord: error sending message:", err)
+			return err
+		}
+	}
+
+	err := database.CreateFunction(name, code)
+	if err != nil {
+		if err == database.ErrFunctionAlreadyExists {
+			_, err = s.ChannelMessageSend(m.ChannelID, "Function already exists")
+			if err != nil {
+				log.Println("discord: error sending message:", err)
+				return err
+			}
+			return nil
+		}
+		log.Println("discord: error creating function:", err)
+		return err
+	}
+
+	_, err = s.ChannelMessageSend(m.ChannelID, "Function created")
+	if err != nil {
+		log.Println("discord: error sending message:", err)
+		return err
+	}
+
+	return nil
+}
+
+func fnrun(s *discordgo.Session, m *discordgo.MessageCreate, name string, args []string) error {
+	output, err := functions.Run(name, args)
+	if err != nil {
+		log.Println("discord: error running function:", err)
+		return err
+	}
+
+	_, err = s.ChannelMessageSend(m.ChannelID, output)
+	if err != nil {
+		log.Println("discord: error sending message:", err)
 		return err
 	}
 
