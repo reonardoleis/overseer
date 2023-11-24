@@ -9,6 +9,7 @@ A "sarcastic" Discord bot, packed with numerous features. While most of them are
 - Text-to-Speech (TTS) using OpenAI's APIs
 - Integration with ChatGPT
 - AI image generation
+- Function creation/execution, allows to create JavaScript functions and call them with args, which will be passed as args parameter into the created function
 
 ### Future features:
 - Music support (YouTube, Spotify)
