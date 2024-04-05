@@ -14,4 +14,4 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         host: ${{ secrets.SSH_HOST }}
         password: ${{ secrets.SSH_PASSWORD }}
-        script: 'cd ~/projects/overseer && ./deploy.sh'
+        script: 'exec bash && cd ~/projects/overseer && ./deploy.sh'
