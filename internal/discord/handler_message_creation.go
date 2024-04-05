@@ -12,7 +12,7 @@ func handleMessageCreation(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if strings.HasPrefix(m.Content, "!") {
+	if strings.HasPrefix(m.Content, "!") && len(m.Content) > 1 {
 		command, args := parseArguments(m.Content)
 
 		commandInfo := getCommandInfo(command)
