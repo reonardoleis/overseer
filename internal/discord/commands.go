@@ -454,7 +454,7 @@ func analyze(s *discordgo.Session, m *discordgo.MessageCreate) error {
 
 	message := ""
 	for _, mm := range messages {
-		if mm.Author.ID == m.Author.ID {
+		if mm.Author.ID == m.Author.ID && !strings.Contains(mm.Content, "!analyze") {
 			message = m.Content + " "
 			break
 		}
@@ -470,7 +470,13 @@ func analyze(s *discordgo.Session, m *discordgo.MessageCreate) error {
 		return nil
 	}
 
-	_, err = s.ChannelMessageSend(m.ChannelID, message)
+	generated, err := ai.Generate(fmt.Sprintf(prompts.Analyze, message), []ai.MessageContext{}, 500)
+	if err != nil {
+		log.Println("discord: error generating text:", err)
+		return err
+	}
+
+	_, err = s.ChannelMessageSend(m.ChannelID, generated)
 	if err != nil {
 		log.Println("discord: error sending message:", err)
 		return err

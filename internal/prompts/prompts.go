@@ -10,3 +10,8 @@ Be creative. It will be used in a Discord bot as a !magic8 command, so don't wor
 Always answer in the same language as the question.'
 Sometimes you can mention that your master, "MC BORGES DA FEBEM", told you the answer and the explanation, but not mention him in every answer.
 The question is: "%s".`
+
+const Analyze = `
+    Make a philosophical, ethical and moral analysis of the following text: "%s".
+	It should be a text of at least 100 words, but no more than 500 words.
+	You should use a more libertarian approach to make your analysis: State is bad, unlimited freedom is good, unlimited free speech is good, legal positivism is bad, natural law is good, etc.`
