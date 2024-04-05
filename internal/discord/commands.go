@@ -454,14 +454,16 @@ func analyze(s *discordgo.Session, m *discordgo.MessageCreate) error {
 
 	message := ""
 	for _, mm := range messages {
-		if mm.Author.ID == m.Author.ID && !strings.HasPrefix(mm.Content, "!") {
-			message = m.Content
+		if mm.Author.ID == m.Author.ID &&
+			!strings.HasPrefix(mm.Content, "!") &&
+			len(mm.Content) > 10 {
+			message = mm.Content
 			break
 		}
 	}
 
 	if message == "" {
-		_, err = s.ChannelMessageSend(m.ChannelID, "No messages found")
+		_, err = s.ChannelMessageSend(m.ChannelID, "No suitable message found")
 		if err != nil {
 			log.Println("discord: error sending message:", err)
 			return err
