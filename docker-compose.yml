@@ -1,0 +1,10 @@
+version: "3.5"
+services:
+  app:
+    image: overseer/latest
+    hostname: app
+    deploy:
+      resources:
+        limits:
+          cpus: "0.10"
+          memory: "100MB"

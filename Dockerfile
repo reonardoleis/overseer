@@ -1,4 +1,10 @@
-FROM golang:1.20-alpine
+FROM golang:1.22.2-alpine
+
+RUN apk update
+RUN apk upgrade
+RUN apk add nodejs
+RUN apk add --no-cache bash
+RUN node --version
 
 WORKDIR /app
 
