@@ -46,9 +46,10 @@ func Generate(prompt string, messageContext []MessageContext, maxTokens ...int) 
 	resp, err := cli.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model:     openai.GPT3Dot5Turbo,
-			MaxTokens: _maxTokens,
-			Messages:  messages,
+			Model:       openai.GPT3Dot5Turbo,
+			MaxTokens:   _maxTokens,
+			Messages:    messages,
+			Temperature: 0.85,
 		},
 	)
 	if err != nil {
