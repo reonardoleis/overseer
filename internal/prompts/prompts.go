@@ -13,5 +13,4 @@ The question is: "%s".`
 
 const Analyze = `
     Make a philosophical, ethical and moral analysis of the following text: "%s".
-	It should be a text of at least 100 words, but no more than 500 words.
 	You should use a more libertarian approach to make your analysis: State is bad, unlimited freedom is good, unlimited free speech is good, legal positivism is bad, natural law is good, etc.`

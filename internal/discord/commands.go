@@ -454,8 +454,8 @@ func analyze(s *discordgo.Session, m *discordgo.MessageCreate) error {
 
 	message := ""
 	for _, mm := range messages {
-		if mm.Author.ID == m.Author.ID && !strings.Contains(mm.Content, "!analyze") {
-			message = m.Content + " "
+		if mm.Author.ID == m.Author.ID && !strings.HasPrefix(mm.Content, "!") {
+			message = m.Content
 			break
 		}
 	}
