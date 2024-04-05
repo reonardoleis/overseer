@@ -1,6 +1,7 @@
 version: "3.5"
 services:
   app:
+    network_mode: host
     image: overseer/latest
     environment:
       - OPENAI_KEY=${OPENAI_KEY}
