@@ -14,6 +14,7 @@ import (
 	"github.com/reonardoleis/overseer/internal/ai"
 	"github.com/reonardoleis/overseer/internal/database"
 	"github.com/reonardoleis/overseer/internal/functions"
+	"github.com/reonardoleis/overseer/internal/prompts"
 	"github.com/reonardoleis/overseer/internal/sound"
 	"github.com/reonardoleis/overseer/internal/utils"
 	openai "github.com/sashabaranov/go-openai"
@@ -404,6 +405,28 @@ func fnrun(s *discordgo.Session, m *discordgo.MessageCreate, name string, args [
 	_, err = s.ChannelMessageSend(m.ChannelID, output)
 	if err != nil {
 		log.Println("discord: error sending message:", err)
+		return err
+	}
+
+	return nil
+}
+
+func magic8(s *discordgo.Session, m *discordgo.MessageCreate, prompt string) error {
+	messageResp, err := s.ChannelMessageSend(m.ChannelID, "Generating text...")
+	if err != nil {
+		log.Println("discord: error sending message:", err)
+		return err
+	}
+
+	text, err := ai.Generate(fmt.Sprintf(prompts.Magic8, prompt), []ai.MessageContext{}, 500)
+	if err != nil {
+		log.Println("discord: error generating text:", err)
+		return err
+	}
+
+	_, err = s.ChannelMessageEdit(m.ChannelID, messageResp.ID, text)
+	if err != nil {
+		log.Println("discord: error editing message:", err)
 		return err
 	}
 

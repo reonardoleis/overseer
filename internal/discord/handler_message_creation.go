@@ -59,6 +59,8 @@ func handleMessageCreation(s *discordgo.Session, m *discordgo.MessageCreate) {
 			fncreate(s, m, args[0], strings.Join(args[1:], " "))
 		case "fnrun":
 			fnrun(s, m, args[0], args[1:])
+		case "magic8":
+			magic8(s, m, strings.Join(args, " "))
 		}
 	}
 }
