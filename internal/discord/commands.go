@@ -440,3 +440,41 @@ func magic8(s *discordgo.Session, m *discordgo.MessageCreate, prompt string) err
 
 	return nil
 }
+
+func analyze(s *discordgo.Session, m *discordgo.MessageCreate) error {
+	messages, err := s.ChannelMessages(m.ChannelID, 10, m.ID, "", "")
+	if err != nil {
+		log.Println("discord: error getting messages:", err)
+		return err
+	}
+
+	if len(messages) == 0 {
+		return nil
+	}
+
+	message := ""
+	for _, mm := range messages {
+		if mm.Author.ID == m.Author.ID {
+			message = m.Content + " "
+			break
+		}
+	}
+
+	if message == "" {
+		_, err = s.ChannelMessageSend(m.ChannelID, "No messages found")
+		if err != nil {
+			log.Println("discord: error sending message:", err)
+			return err
+		}
+
+		return nil
+	}
+
+	_, err = s.ChannelMessageSend(m.ChannelID, message)
+	if err != nil {
+		log.Println("discord: error sending message:", err)
+		return err
+	}
+
+	return nil
+}

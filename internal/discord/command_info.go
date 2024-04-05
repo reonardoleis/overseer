@@ -28,6 +28,7 @@ var (
 		"fncreate":       {5000, true, []string{"name", "code..."}},
 		"fnrun":          {100, true, []string{"name, args..."}},
 		"magic8":         {200, true, []string{"prompt"}},
+		"analyze":        {0, false, []string{}},
 	}
 )
 
