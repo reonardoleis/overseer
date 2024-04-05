@@ -418,7 +418,15 @@ func magic8(s *discordgo.Session, m *discordgo.MessageCreate, prompt string) err
 		return err
 	}
 
-	text, err := ai.Generate(fmt.Sprintf(prompts.Magic8, prompt), []ai.MessageContext{}, 500)
+	coinflip := rand.Intn(2)
+	var work string
+	if coinflip == 0 {
+		work = "yes"
+	} else {
+		work = "no"
+	}
+
+	text, err := ai.Generate(fmt.Sprintf(prompts.Magic8, work, prompt), []ai.MessageContext{}, 500)
 	if err != nil {
 		log.Println("discord: error generating text:", err)
 		return err
