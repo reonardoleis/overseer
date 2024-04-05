@@ -472,13 +472,19 @@ func analyze(s *discordgo.Session, m *discordgo.MessageCreate) error {
 		return nil
 	}
 
+	response, err := s.ChannelMessageSend(m.ChannelID, "Analyzing text...")
+	if err != nil {
+		log.Println("discord: error sending message:", err)
+		return err
+	}
+
 	generated, err := ai.Generate(fmt.Sprintf(prompts.Analyze, message), []ai.MessageContext{}, 500)
 	if err != nil {
 		log.Println("discord: error generating text:", err)
 		return err
 	}
 
-	_, err = s.ChannelMessageSend(m.ChannelID, generated)
+	_, err = s.ChannelMessageEdit(m.ChannelID, response.ID, generated)
 	if err != nil {
 		log.Println("discord: error sending message:", err)
 		return err
