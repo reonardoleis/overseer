@@ -1,0 +1,7 @@
+CREATE TABLE functions(
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(128) NOT NULL,
+  code TEXT NOT NULL,
+  guild_id VARCHAR(256)  NOT NULL,
+  user_id VARCHAR(256) NOT NULL
+);

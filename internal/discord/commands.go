@@ -11,13 +11,16 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/uuid"
+	openai "github.com/sashabaranov/go-openai"
+
 	"github.com/reonardoleis/overseer/internal/ai"
 	"github.com/reonardoleis/overseer/internal/database"
+	"github.com/reonardoleis/overseer/internal/database/models"
+	"github.com/reonardoleis/overseer/internal/database/repository"
 	"github.com/reonardoleis/overseer/internal/functions"
 	"github.com/reonardoleis/overseer/internal/prompts"
 	"github.com/reonardoleis/overseer/internal/sound"
 	"github.com/reonardoleis/overseer/internal/utils"
-	openai "github.com/sashabaranov/go-openai"
 )
 
 func audio(s *discordgo.Session, m *discordgo.MessageCreate, idOrAlias string) error {
@@ -158,7 +161,12 @@ func randomaudios(s *discordgo.Session, m *discordgo.MessageCreate, n string) er
 	return nil
 }
 
-func chatgpt(s *discordgo.Session, m *discordgo.MessageCreate, prompt string, useContext bool) error {
+func chatgpt(
+	s *discordgo.Session,
+	m *discordgo.MessageCreate,
+	prompt string,
+	useContext bool,
+) error {
 	gptContext := []ai.MessageContext{}
 	var manager *Manager
 	if useContext {
@@ -218,7 +226,7 @@ func help(s *discordgo.Session, m *discordgo.MessageCreate) error {
 	return nil
 }
 
-func leave(s *discordgo.Session, m *discordgo.MessageCreate) error {
+func leave(_ *discordgo.Session, m *discordgo.MessageCreate) error {
 	manager := getManager(m.GuildID)
 
 	err := manager.vc.Disconnect()
@@ -236,7 +244,10 @@ func loop(s *discordgo.Session, m *discordgo.MessageCreate) error {
 	manager := getManager(m.GuildID)
 	manager.audioQueue.loop = !manager.audioQueue.loop
 
-	_, err := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Looping is now %t", manager.audioQueue.loop))
+	_, err := s.ChannelMessageSend(
+		m.ChannelID,
+		fmt.Sprintf("Looping is now %t", manager.audioQueue.loop),
+	)
 	if err != nil {
 		log.Println("discord: error sending message:", err)
 		return err
@@ -372,18 +383,25 @@ func fncreate(s *discordgo.Session, m *discordgo.MessageCreate, name, code strin
 		}
 	}
 
-	err := database.CreateFunction(name, code)
+	if strings.Contains(name, "\n") {
+		code = strings.Split(name, "\n")[1] + " " + code
+		name = strings.Split(name, "\n")[0]
+	}
+
+	existed, err := repository.
+		Prepare(m.GuildID, m.Author.ID).
+		CreateFunction(&models.Function{
+			Name: name,
+			Code: functions.Code(name, code),
+		})
 	if err != nil {
-		if err == database.ErrFunctionAlreadyExists {
-			_, err = s.ChannelMessageSend(m.ChannelID, "Function already exists")
-			if err != nil {
-				log.Println("discord: error sending message:", err)
-				return err
-			}
-			return nil
-		}
 		log.Println("discord: error creating function:", err)
 		return err
+	}
+
+	if existed {
+		s.ChannelMessageSend(m.ChannelID, "A function with the same name already exists")
+		return nil
 	}
 
 	_, err = s.ChannelMessageSend(m.ChannelID, "Function created")
@@ -396,7 +414,18 @@ func fncreate(s *discordgo.Session, m *discordgo.MessageCreate, name, code strin
 }
 
 func fnrun(s *discordgo.Session, m *discordgo.MessageCreate, name string, args []string) error {
-	output, err := functions.Run(name, args)
+	function, exists, err := repository.Prepare(m.GuildID, m.Author.ID).GetFunction(name)
+	if err != nil {
+		log.Println("discord: error finding function: ", err)
+		return err
+	}
+
+	if !exists {
+		s.ChannelMessageSend(m.ChannelID, "Function not found")
+		return nil
+	}
+
+	output, err := functions.Run(function.Code, args)
 	if err != nil {
 		log.Println("discord: error running function:", err)
 		return err

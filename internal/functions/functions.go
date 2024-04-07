@@ -8,11 +8,11 @@ import (
 	"time"
 )
 
-func Run(filename string, args []string) (string, error) {
+func Run(code string, args []string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	command := "node functions/" + filename + ".js"
+	command := fmt.Sprintf(`node -e "%s" `, strings.ReplaceAll(code, `"`, `\"`))
 
 	for _, arg := range args {
 		command += " \"" + arg + "\""
@@ -38,32 +38,30 @@ func Code(name, code string) string {
 	return code
 }
 
-var (
-	forbiddenTokens = []string{
-		"child_process",
-		"fs",
-		"require",
-		"exec",
-		"spawn",
-		"execFile",
-		"execFileSync",
-		"execSync",
-		"spawnSync",
-		"readFileSync",
-		"writeFileSync",
-		"unlinkSync",
-		"rmSync",
-		"rmdirSync",
-		"mkdirSync",
-		"appendFileSync",
-		"accessSync",
-		"chmodSync",
-		"chownSync",
-		"lchmodSync",
-		"lchownSync",
-		"linkSync",
-	}
-)
+var forbiddenTokens = []string{
+	"child_process",
+	"fs",
+	"require",
+	"exec",
+	"spawn",
+	"execFile",
+	"execFileSync",
+	"execSync",
+	"spawnSync",
+	"readFileSync",
+	"writeFileSync",
+	"unlinkSync",
+	"rmSync",
+	"rmdirSync",
+	"mkdirSync",
+	"appendFileSync",
+	"accessSync",
+	"chmodSync",
+	"chownSync",
+	"lchmodSync",
+	"lchownSync",
+	"linkSync",
+}
 
 func Validate(code string) bool {
 	for _, token := range forbiddenTokens {

@@ -5,7 +5,9 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+
 	"github.com/reonardoleis/overseer/internal/ai"
+	"github.com/reonardoleis/overseer/internal/database"
 	"github.com/reonardoleis/overseer/internal/discord"
 )
 
@@ -16,6 +18,12 @@ func main() {
 	}
 
 	ai.Init(os.Getenv("OPENAI_KEY"))
+
+	err = database.Connect()
+	if err != nil {
+		log.Println("error connecting to database", err)
+		return
+	}
 
 	cli, err := discord.Init(os.Getenv("DISCORD_TOKEN"))
 	if err != nil {
