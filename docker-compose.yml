@@ -6,6 +6,7 @@ services:
     environment:
       - OPENAI_KEY=${OPENAI_KEY}
       - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - POSTGRES_CONN_STRING=${POSTGRES_CONN_STRING}
     volumes:
       - ${FUNCTIONS_PATH}:/app/functions
       - ${AUDIOS_PATH}:/app/audios
