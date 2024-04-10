@@ -12,7 +12,7 @@ A "sarcastic" Discord bot, packed with numerous features. While most of them are
 - Function creation/execution, allows to create JavaScript functions and call them with args, which will be passed as args parameter into the created function
 
 ### Future features:
-- Music support (YouTube, Spotify)
+- Music support (YouTube, Spotify, etc)
 - Speech-to-text for adding voice recognition to certain features
 - Moderation with "meme punishments" utilizing voice recognition
 - AI video generation with virtual webcam streaming
