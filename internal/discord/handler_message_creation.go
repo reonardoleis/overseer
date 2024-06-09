@@ -31,7 +31,9 @@ func handleMessageCreation(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 		switch command {
-		case "join":
+    case "ping":
+      ping(s, m)
+    case "join":
 			join(s, m)
 		case "audio":
 			audio(s, m, args[0])

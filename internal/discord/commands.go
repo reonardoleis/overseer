@@ -521,3 +521,13 @@ func analyze(s *discordgo.Session, m *discordgo.MessageCreate) error {
 
 	return nil
 }
+
+func ping(s *discordgo.Session, m *discordgo.MessageCreate) error {
+  _, err := s.ChannelMessageSend(m.ChannelID, "pong")
+  if err != nil {
+    log.Println("discord: error sending message: ", err)
+    return err
+  }
+
+  return nil
+}

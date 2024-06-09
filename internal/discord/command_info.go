@@ -13,7 +13,8 @@ type CommandInfo struct {
 
 var (
 	commands = map[string]*CommandInfo{
-		"join":           {0, false, []string{}},
+    "ping":           {0, false, []string{}},
+    "join":           {0, false, []string{}},
 		"audio":          {1, false, []string{"ID or alias"}},
 		"favoritecreate": {2, false, []string{"ID", "alias"}},
 		"favoritelist":   {0, false, []string{}},
